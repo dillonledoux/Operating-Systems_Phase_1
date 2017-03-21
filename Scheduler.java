@@ -29,6 +29,8 @@ public class Scheduler{
 	
     
 // Core Functions	
+   
+    
     public int getHighestNonEmptySbqNumber(){
     	if(!sbq1.isEmpty()){
     		return 1;
@@ -47,21 +49,22 @@ public class Scheduler{
     	}
     }
     
+    public Queue getSubQ(int number){
+    	switch (number){
+    		case 1: return sbq1;
+    		case 2: return sbq2;
+    		case 3: return sbq3;
+    		default: return sbq4;
+    	}
+    }
+    
     
     public PCB getNextPCB(){
-    	return getSubQ(getHighestNonEmptySbqNumber()).pop();
-    }
-    
-    public boolean pollBlockedQ(){
-    	if(blockedQ.peek().getTimeFinishIO()<=system.getClk()){
-    		moveFromBtoR(blockedQ.peek());
-    		return true;
-    	}
-    	return false;   	
+    	System.out.println("Highest non empty queue is: "+getHighestNonEmptySbqNumber());
+    	return getSubQ(getHighestNonEmptySbqNumber()).remove(0);
     }
     
     
-     
     
 	public void setup(ArrayList<Integer> list){    
 	    PCB job = createPCB(list);
@@ -69,36 +72,45 @@ public class Scheduler{
 		addToReadyQ(job);
 	}	
 
-	public int update(PCB job){
-		int curBurst = job.getCurBurst();
-		System.out.println("here");
-		if(curBurst>job.getQuantum()){
-			job.setCurBurst(curBurst-job.getQuantum());
-			updateQandT(job);
-			endQuantumResch(job);
-			return job.getQuantum();
-		}
-		else if(curBurst<job.getQuantum()){
-			if(job.hasMoreBursts()){
-				moveFromRtoB(job);
-				job.resetTurns();
-				job.updateCurBurst();
-				return curBurst;
-			}
-			job.setIsFinished(true);
-			removeFromReadyQ(job);
-			return curBurst;
-			
-		}
-		else{
-			if(job.hasMoreBursts()){
-				moveFromRtoB(job);
+	public int getNextTask(){
+		if(getRQSize() != 0){
+			System.out.println(getRQSize());
+			PCB job = getNextPCB();
+			int curBurst = job.getCurBurst();
+			if(curBurst>job.getQuantum()){
+				job.setCurBurst(curBurst-job.getQuantum());
+				job.incrCpuShots();
+				job.incrTimeUsed(job.getQuantum());
+				updateQandT(job);
+				endQuantumResch(job);
 				return job.getQuantum();
 			}
-			job.setIsFinished(true);
-			return curBurst;
+			else if(curBurst<job.getQuantum()){
+				if(job.hasMoreBursts()){
+					moveFromRtoB(job);
+					job.resetTurns();
+					job.updateCurBurst();
+					return curBurst;
+				}
+				job.setIsFinished(true);
+				job.setTimeDelivered();
+				system.jobTerminated(job);
+				return curBurst;
+			}
+			else{
+				if(job.hasMoreBursts()){
+					moveFromRtoB(job);
+					return job.getQuantum();
+				}
+				job.setIsFinished(true);
+				job.setTimeDelivered();
+				system.jobTerminated(job);
+				return curBurst;
+			}
 		}
+		return 0;							// return of zero indicates no jobs in RQ
 	}
+	
 	
 	public void updateQandT(PCB job){
 		job.decrementTurns();
@@ -118,33 +130,23 @@ public class Scheduler{
     }
 
     public void moveFromRtoB(PCB job){
-        switch (job.getSubQNumber()){
-            case 1: sbq1.pop();
-                    break;
-            case 2: sbq2.pop();
-                    break;
-            case 3: sbq3.pop();
-                    break;
-            default:sbq4.pop();
-             		break;
-        }
         blockedQ.add(job);
+        if(job.getSubQNumber()!=1){
+        	job.setSubQ(1);
+        	job.resetTurns();
+        }
         job.incrIOReq();
-        job.setTimeFinishIO(system.getClk());
+        job.setTimeFinishIO(system.getClk()+10);
 
     }
-    public void moveFromBtoR(PCB job){
-        getBlockedQ().remove(0);
-        switch (job.getSubQNumber()){
-            case 1: sbq1.add(job);
-                    break;
-            case 2: sbq2.add(job);
-                    break;
-            case 3: sbq3.add(job);
-                    break;
-            default:sbq4.add(job);
-            		break;
-        }
+    public void checkBlockedQ(){
+    	while(true){
+    		PCB job = blockedQ.peek();
+    		if(system.getClk() < job.getTimeFinishIO()){
+    			break;
+    		}
+    		addToSubQ(job.getSubQNumber(), job);
+    	}
     }
     public void demote(PCB job){
         if(job.getSubQNumber()!=4){job.setSubQ(job.getSubQNumber()+1);}
@@ -161,22 +163,7 @@ public class Scheduler{
             default: break;                 
         }
     }
-    public void promote(PCB job){
-        if(job.getSubQNumber()!=1){job.setSubQ(job.getSubQNumber()-1);}
-        switch (job.getSubQNumber()){
-            case 4:sbq4.remove(job);
-            		sbq3.add(job);
-                    break;
-            case 3: sbq3.remove(job);
-            		sbq2.add(job);
-                    break;
-            case 2: sbq2.remove(job);
-            		sbq1.add(job);
-                    break;
-            default: break;                  
-        }    
-    }
-    
+  
 // Situational Functions
     public PCB createPCB(ArrayList<Integer> list){
         ArrayList<Integer> info = list;
@@ -187,40 +174,19 @@ public class Scheduler{
     }
      
     public void endQuantumResch(PCB job){
-        int q = job.getSubQNumber();
-        switch (q) {
-            case 1: getSubQ(1).remove(0);
-            		getSubQ(1).add(job);
+        int qNumber = job.getSubQNumber();
+        switch (qNumber) {
+            case 1: sbq1.add(job);
                     break;
-            case 2: getSubQ(2).remove(0);
-            		getSubQ(2).add(job);
+            case 2: sbq2.add(job);
                     break;
-            case 3: getSubQ(3).remove(0);
-            		getSubQ(3).add(job);
+            case 3: sbq3.add(job);
                     break;
-            case 4: getSubQ(4).remove(0);
-            		getSubQ(4).add(job);
-                    break;
-            default: break;
+            default:sbq4.add(job);
         }
     }
       
-	public void removeFromReadyQ(PCB job){
-		if(job.getSubQNumber()==1){
-			sbq1.remove(0);
-	    }
-	    else if(job.getSubQNumber()==2){
-	    	sbq2.remove(0);
-	    }
-	    else if(job.getSubQNumber()==3){
-	    	sbq3.remove(0);
-	    }
-	    else{
-	    	sbq3.remove(0);
-	    }
-	}
 
-	
 	// Q Methods
     public void addToSubQ(int number, PCB job ){
     	if(number == 1){
@@ -246,15 +212,8 @@ public class Scheduler{
         int sizeRQ = sbq1.size() + sbq2.size() + sbq3.size() + sbq4.size();
         return sizeRQ;
     }    
-    public Queue getSubQ(int number){
-    	switch (number){
-    		case 1: return sbq1;
-    		case 2: return sbq2;
-    		case 3: return sbq3;
-    		default: return sbq4;
-    	}
-    }
+
     public Queue getBlockedQ(){
     	return blockedQ;
-    }
+    } 
 }

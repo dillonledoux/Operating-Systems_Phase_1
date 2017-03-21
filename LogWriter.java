@@ -4,8 +4,8 @@ import java.io.IOException;
 
 public class LogWriter {
 	
-	private static final String SYS_LOG_PATH = "/Users/dillonledoux/Desktop/SYS_LOG.txt";  //   C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt
-	private static final String JOB_LOG_PATH = "/Users/dillonledoux/Desktop/JOB_LOG.txt";	// C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt
+	private static final String SYS_LOG_PATH = "C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt";  //   C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt    /Users/dillonledoux/Desktop/SYS_LOG.txt
+	private static final String JOB_LOG_PATH = "C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt";	// C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt
 	
 	SYSTEM sys;
 	Mem_manager mem;

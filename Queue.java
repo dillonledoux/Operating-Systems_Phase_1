@@ -41,6 +41,9 @@ public class Queue extends ArrayList<PCB>{
     	return al_q.size();
     }
 
+    public boolean isEmpty(){
+    	return al_q.isEmpty();
+    }
 
 
 }

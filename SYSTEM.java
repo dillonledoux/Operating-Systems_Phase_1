@@ -40,20 +40,23 @@ public class SYSTEM{
    
      
      public void simulate(){
-    	loader.loadTasks();
+    	while(loader.hasMoreJobsInFile() || scheduler.getTotalPCBs() != 0){
+    		
+    		loader.loadTasks();
     		
 /**/			scheduler.getSubQ(1).printIDs();
 
-System.out.println("total PCBs in system: " +scheduler.getTotalPCBs());
-System.out.println("items in JobQ: "+ loader.getJobQSize());
-    		if(scheduler.getRQSize() != 0) cpu.execute();
 
-    	//	if(CLOCK  - lastWriteToSysLog >= 100){
+    		if(scheduler.getRQSize() != 0){ 
+    			cpu.execute();
+    		}
+    		scheduler.checkBlockedQ();
+    		if(CLOCK  - lastWriteToSysLog >= 100){
 
     			lastWriteToSysLog = CLOCK;
     			logger.writeToSysLog();
-    	//	}
-    		
+    		}
+    	}	
     	
 /**/ 	System.out.println("break while loop");
      }

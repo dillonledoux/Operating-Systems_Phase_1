@@ -13,7 +13,7 @@ public class Loader{
 	private String jobFilePointerLocalWin = "C:\\Users\\Dillon LeDoux\\Desktop\\17s-ph1-data.txt";
 	private String jobFilePointerLocalMac = "/Users/dillonledoux/Desktop/testData.txt";
 	
-	private final File jobFile = new File(jobFilePointerLocalMac);
+	private final File jobFile = new File(jobFilePointerLocalWin);
 	private Scanner scanner;
 	
 	private boolean moreJobsInFile = true;
@@ -47,8 +47,8 @@ public class Loader{
     public boolean hasMoreJobsInFile(){
       return moreJobsInFile;
     }
-   
-    public void loadTasks(){
+    
+    public void loadFromJobQ(){
     	int index = 0;
     	boolean canAllocate; 
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff()  
@@ -61,6 +61,11 @@ public class Loader{
     			}
     			index++;
     	}
+    }
+   
+    public void loadTasks(){
+    	loadFromJobQ();
+    	boolean canAllocate;
     	ArrayList<Integer> newJob;   	
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff() && scheduler.getTotalPCBs()<15
     			&& moreJobsInFile ){
