@@ -16,7 +16,7 @@ public class CPU{
 		System.out.print("yay");
 		
 		try{
-			PCB task = scheduler.getNextTask();
+			PCB task = scheduler.getNextPCB();
 			
 			int exTime = scheduler.update(task);
 

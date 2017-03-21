@@ -9,7 +9,8 @@ public class SYSTEM{
      private static int freeMemory = 512;      					// Memory setup initial free space: 512 units
      public static int totalMemory = 512;        				// Memory setup initial used: 0 units
  
-     protected int jobsDelivered = 0;
+     private int jobsDelivered = 0;
+     private boolean jobsIncoming = true;
      
 // Object Variables
      Mem_manager mem_manager;
@@ -43,11 +44,12 @@ public class SYSTEM{
     		
 /**/			scheduler.getSubQ(1).printIDs();
 
-
+System.out.println("total PCBs in system: " +scheduler.getTotalPCBs());
+System.out.println("items in JobQ: "+ loader.getJobQSize());
     		if(scheduler.getRQSize() != 0) cpu.execute();
-    		
+
     	//	if(CLOCK  - lastWriteToSysLog >= 100){
-/**/    	    System.out.print("HERE");
+
     			lastWriteToSysLog = CLOCK;
     			logger.writeToSysLog();
     	//	}
@@ -55,13 +57,7 @@ public class SYSTEM{
     	
 /**/ 	System.out.println("break while loop");
      }
-
      
-     
-     
-     
-     
-    
      public String getSystemStartTime(){
         return systemStartTime;
      }
@@ -84,10 +80,6 @@ public class SYSTEM{
       public void incrementClk(){
          CLOCK++;
       }
-
-
-
-
     
 // Memory Methods    
     public int getFreeMemory(){
@@ -113,4 +105,12 @@ public class SYSTEM{
         mem_manager.release(finishedJob.getJobSize());
         incrJobsDelivered();
     }
+    public boolean hasJobsIncoming(){
+    	return jobsIncoming;
+    }
+    public void setJobsIncoming(boolean value){
+    	jobsIncoming = value;
+    }
+    	
+    
 }

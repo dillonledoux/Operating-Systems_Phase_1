@@ -37,6 +37,9 @@ public class Queue extends ArrayList<PCB>{
     	}
     	System.out.println();
     }
+    public int size(){
+    	return al_q.size();
+    }
 
 
 

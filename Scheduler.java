@@ -12,10 +12,6 @@ public class Scheduler{
     private Queue sbq4;  //subqueue 4
     
     private Queue blockedQ;
-    
-    private ArrayList<PCB> al1 = new ArrayList<>();
-    private ArrayList<PCB> al2 = new ArrayList<>();
-
 
 // Constructor    
     public Scheduler(SYSTEM systemIn, Mem_manager mem_managerIn){
@@ -28,41 +24,32 @@ public class Scheduler{
         sbq3 = new Queue(15);
         sbq4 = new Queue(15);
         
-        blockedQ = new Queue(15);
-    
-    
-    
-    
-    
-    
+        blockedQ = new Queue(15);  
     }
 	
-    public int getSize(){
-    	if(al1 == null || al1.isEmpty()){
-    		return 0;
-    	}
-    	return al1.size();
-    }
     
 // Core Functions	
-    public int getTotalArListElements(){
-    	return al1.size() + al2.size();
-    }
-
-    
-    public PCB getNextTask(){
+    public int getHighestNonEmptySbqNumber(){
     	if(!sbq1.isEmpty()){
-    		return sbq2.peek();
+    		return 1;
     	}
     	else if(!sbq2.isEmpty()){
-    		return getSubQ(2).peek();
+    		return 2;
     	}
     	else if(!sbq3.isEmpty()){
-    		return sbq3.peek();
+    		return 3;
+    	}
+    	else if(!sbq4.isEmpty()){
+    		return 4;
     	}
     	else{
-    		return sbq4.peek();
+    		return 0;
     	}
+    }
+    
+    
+    public PCB getNextPCB(){
+    	return getSubQ(getHighestNonEmptySbqNumber()).pop();
     }
     
     public boolean pollBlockedQ(){
@@ -72,6 +59,8 @@ public class Scheduler{
     	}
     	return false;   	
     }
+    
+    
      
     
 	public void setup(ArrayList<Integer> list){    
@@ -97,7 +86,7 @@ public class Scheduler{
 				return curBurst;
 			}
 			job.setIsFinished(true);
-//			job.removeFromReadyQ();
+			removeFromReadyQ(job);
 			return curBurst;
 			
 		}
@@ -124,16 +113,9 @@ public class Scheduler{
 
 // Queue Mutators
     public void addToReadyQ(PCB job){
-    	System.out.println("Added to Ready Q");
-
     	job.assignTurns(1);
-        sbq1.add(job);
- /**/       //System.out.println(getSubQ(1).peek().getJobID());
-        
-        
+        sbq1.add(job);        
     }
-
-
 
     public void moveFromRtoB(PCB job){
         switch (job.getSubQNumber()){
@@ -204,8 +186,6 @@ public class Scheduler{
 	    return pcb;
     }
      
-
-
     public void endQuantumResch(PCB job){
         int q = job.getSubQNumber();
         switch (q) {
@@ -227,16 +207,16 @@ public class Scheduler{
       
 	public void removeFromReadyQ(PCB job){
 		if(job.getSubQNumber()==1){
-			getSubQ(1).remove(0);
+			sbq1.remove(0);
 	    }
 	    else if(job.getSubQNumber()==2){
-	    	getSubQ(2).remove(0);
+	    	sbq2.remove(0);
 	    }
 	    else if(job.getSubQNumber()==3){
-	    	getSubQ(3).remove(0);
+	    	sbq3.remove(0);
 	    }
 	    else{
-	    	getSubQ(4).remove(0);
+	    	sbq3.remove(0);
 	    }
 	}
 
@@ -257,36 +237,10 @@ public class Scheduler{
     	}
     }
         
-    public int getSbqSize(int number){
-    	if(number == 1){
-  //  		if(sbq1 == null || sbq1.isEmpty()){
-    			return 0;
-  //  		}
-  //  		return sbq1.size();   		
-    	}
-    	else if(number == 2){
-    		if(sbq2 == null || sbq2.isEmpty()){
-    			return 0;
-    		}
-    		return sbq2.size();  
-    	}
-    	else if(number == 3){
-    		if(sbq3 == null || sbq3.isEmpty()){
-    			return 0;
-    		}
-    		return sbq3.size();  
-    	}
-    	else{
-    		if(sbq4 == null || sbq4.isEmpty()){
-    			return 0;
-    		}
-    		return sbq4.size();  
-    	}
-    }
-    
     public int getTotalPCBs(){
-    	return (blockedQ.size() + sbq1.size() + sbq2.size()
-    			+ sbq3.size() + sbq4.size());
+    	int toReturn = (blockedQ.size() + sbq1.size() + sbq2.size()
+		+ sbq3.size() + sbq4.size());
+    	return toReturn;
     }
     public int getRQSize(){
         int sizeRQ = sbq1.size() + sbq2.size() + sbq3.size() + sbq4.size();

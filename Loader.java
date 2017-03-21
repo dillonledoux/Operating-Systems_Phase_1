@@ -17,9 +17,8 @@ public class Loader{
 	private Scanner scanner;
 	
 	private boolean moreJobsInFile = true;
-//	private int counter = 0;
 	
-	protected ArrayList<ArrayList<Integer>> jobQ = new ArrayList<>(); 
+	protected ArrayList<ArrayList<Integer>> jobQ = new ArrayList<ArrayList<Integer>>(); 
 		
 	SYSTEM system;
 	Mem_manager mem_manager;
@@ -51,8 +50,7 @@ public class Loader{
    
     public void loadTasks(){
     	int index = 0;
-    	boolean canAllocate;
-/**/    	System.out.println(scheduler.getTotalPCBs());  
+    	boolean canAllocate; 
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff()  
     			&& scheduler.getSubQ(1).size()<15 && index<jobQ.size()){
     		
@@ -63,25 +61,35 @@ public class Loader{
     			}
     			index++;
     	}
-    	ArrayList<Integer> newJob = getNextJob();
-    	System.out.println("here");
-    	
+    	ArrayList<Integer> newJob;   	
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff() && scheduler.getTotalPCBs()<15
-    			&& moreJobsInFile && newJob.get(0) != 0){
-    		canAllocate = mem_manager.allocate(newJob.get(1));
+    			&& moreJobsInFile ){
+    		newJob = getNextJob();
+    		System.out.println("\nFree Memory: "+system.getFreeMemory());
+    		if(newJob.get(0) != 0){
+    			canAllocate = mem_manager.allocate(newJob.get(1));
+    			System.out.println("moreJobsInFile = "+moreJobsInFile);
     			if(canAllocate){
+    				System.out.println("Job#" +newJob.get(0)+ " added to RQ");
     				scheduler.setup(newJob);
+    				
     			}
     			else{
+    				System.out.println("Job# "+newJob.get(0)+ "added to JQ");
     				jobQ.add(newJob);
+    				
     			}
+    		}
+    		else{
+    			system.setJobsIncoming(false);
+    			break;
+    		}
     	}
     }
     
 // Initialization Methods
     
     public ArrayList<Integer> getNextJob(){
-		System.out.println("here");
     	String line = scanner.nextLine();
     	if(scanner.hasNextLine() == false){
     		moreJobsInFile = false;
@@ -93,18 +101,16 @@ public class Loader{
         for(String s: stringList){
         	jobInfo.add(Integer.valueOf(s));
         }
-        ;
-        return jobInfo;          
+        return jobInfo;   
      }
 
      public ArrayList<ArrayList<Integer>> getJobQ(){
     	return jobQ;
      }
-     public int getJobQSize(){
-    	 return jobQ.size();
-     }
      public void addToJobQ(ArrayList<Integer> job){
      	jobQ.add(job);
      }
-    
+    public int getJobQSize(){
+    	return jobQ.size();
+    }
 }

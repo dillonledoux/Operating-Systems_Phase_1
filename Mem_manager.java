@@ -2,7 +2,7 @@
 public class Mem_manager{
 	
 	SYSTEM system;
-	private static final int memCutoff = 20;
+	private static final int memCutoff = 5;
 	
 	public Mem_manager(SYSTEM systemIn){
 	    system = systemIn;
