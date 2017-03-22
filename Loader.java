@@ -49,7 +49,7 @@ public class Loader{
     	int index = 0;
     	boolean canAllocate; 
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff()  
-    			&& scheduler.getSubQ(1).size()<15 && index<jobQ.size()){
+    			&& scheduler.getTotalPCBs()<15 && index<jobQ.size()){
     		
     			canAllocate = mem_manager.allocate(jobQ.get(index).get(1));
     			
