@@ -25,16 +25,15 @@ public class LogWriter {
 	
     public void writeToSysLog(){
         String toWriteMem = mem.memStats();
-        String toWriteJobs = "\nNumber of jobs in Job_Q:\t" +ld.getJobQ().size()+ 
-                             "\nNumber of jobs in Blocked_Q:\t" +sch.getBlockedQ().size()+
-                             "\nNumber of jobs in Ready_Q:\t" +sch.getRQSize()+
-                             "\nTotal jobs delivered:\t\t" +sys.getJobsDelivered()+ "\n";
-        
+        String toWriteJobs = String.format("  %-2d   |    %-2d   |  %-2d   |    %-3d    |", ld.getJobQ().size(),sch.getBlockedQ().size(),sch.getRQSize(), sys.getJobsDelivered());
+        String dottedLine = "\n-----------------------------------------------------------------\n";		
+        		
         File file = new File(SYS_LOG_PATH);
     	try{
     		FileWriter append = new FileWriter(file, true);
         	append.write(toWriteMem);
         	append.write(toWriteJobs);
+        	append.write(dottedLine);
         	append.close();
     	}
     	catch(IOException e){
@@ -46,12 +45,18 @@ public class LogWriter {
      } 
     
     public static void setupSysLog(){
-    	String header = "\nSYS_LOG file starting at CSX time of "+SYSTEM.systemStartTime;        
-		File file = new File(SYS_LOG_PATH);
+    	String header1 = "\nSYS_LOG file starting at CSX time of "+SYSTEM.systemStartTime;        
+		String header2 = "\n\nVirtual |  Free  |  Used  |  Job  | Blocked | Ready |   Jobs    |"
+						+  "\n Clock  | Memory | Memory | Queue |  Queue  | Queue | Delivered |"
+						+  "\n*****************************************************************";
+						
+    	File file = new File(SYS_LOG_PATH);
+	    	
 		try{
 			file.createNewFile();
 			FileWriter writer = new FileWriter(file);
-			writer.write(header);
+			writer.write(header1);
+			writer.write(header2);
 			writer.close();
 		}
 		catch(IOException e){
@@ -60,7 +65,10 @@ public class LogWriter {
 		
     }
     public static void setupJobLog(){
-        String header = "\nJOB_LOG file starting at CSX time of "+SYSTEM.systemStartTime+ " \n\nJob ID\tEntry Time\tTerm. Time\tEx. Time\tCPU Shots\n";        
+        String header = "\nJOB_LOG file starting at CSX time of "+SYSTEM.systemStartTime+ 
+        			 " \n\nJob ID | Time of |   Time of   | Execution |  CPU  |"
+        			 +  "\nNumber | Arrival | Termination |    Time   | Shots |"
+        			 +  "\n****************************************************\n";
         File file = new File(JOB_LOG_PATH);
         try{    
 			file.createNewFile();
@@ -76,10 +84,12 @@ public class LogWriter {
     
     public void writeToJobLog(PCB job){
         String toWrite = job.jobStats();
+        String dottedLine = "\n----------------------------------------------------\n";
         File file = new File(JOB_LOG_PATH);
     	try{
     		FileWriter append = new FileWriter(file, true);
-        	append.write(toWrite);
+    		append.write(toWrite);
+    		append.write(dottedLine);
         	append.close();
     	}
     	catch(IOException e){

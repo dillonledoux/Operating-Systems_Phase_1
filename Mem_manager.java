@@ -26,9 +26,10 @@ public class Mem_manager{
     	return memCutoff;
     }
     public String memStats(){
-            //  @ X time units          Free Space                 Used Space
-        return "\n@ " +system.getClk()+ " Time Units:\nFree Space = " +system.getFreeMemory()+ "  |  Used Space = " 
-                +(SYSTEM.totalMemory-system.getFreeMemory())+"";
+
+    	String toReturn = String.format("\n%-5d   |   %-3d  |  %-3d   |",
+    			system.getClk(), system.getFreeMemory(), (SYSTEM.totalMemory-system.getFreeMemory()));
+    	return toReturn;
     }
 
 }

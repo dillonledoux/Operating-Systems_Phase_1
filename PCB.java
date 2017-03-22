@@ -33,11 +33,10 @@ public class PCB {
 //Functions
     public String jobStats(){
         String stats;
-        // format:
-        // job ID   EntryTime   TerminationTime    ExecTime    CpuShots
-        stats = "\n" +jobID+ "\t" +timeArrival+ "\t\t" +timeDelivered+ 
-                "\t\t" +((IoReq*10)+timeUsed)+ "\t\t" +cpuShots+ 
-                "\n-----------------------------------------------------------";
+        stats = String.format("%-3d    |  %-5d  |    %-5d    |    %-4d   |  %-2d   |", 
+        		jobID, timeArrival, timeDelivered, ((IoReq*10)+timeUsed), cpuShots);
+
+        
         return stats;
     }
     	
