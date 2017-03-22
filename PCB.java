@@ -3,13 +3,10 @@ import java.util.ArrayList;
 
 public class PCB {
 	
-// Global variables
-	private int clk;
-	
+// Global variables	
 	private int jobID;
 	private int jobSize;		// memory required for job
 	
-	private int numberPredBursts; // bursts predicted at the start of the job
 	private ArrayList<Integer> totalPredBursts;		// the burst length for each predicted job
 	private int curBurst;		// current burst length
 	
@@ -19,17 +16,17 @@ public class PCB {
 	private int timeFinishIO;
 	private int IoReq;          // number of I/O requests
 	private int cpuShots;       // number of shots the job gets at the cpu
-	private boolean isFinished = false;
+	//private boolean isFinished = false;
 	
 	private int subQ = 0;       //current subqueue
 	private int subQTurns = 0;  //turns spent in given subqueue;
 	
 // Constructor
-	public PCB(int id, int size, int cBurst, ArrayList<Integer> bursts, int clkIn){
+	public PCB(int id, int size, int cBurst, ArrayList<Integer> bursts){
 		jobID = id;
 		jobSize = size;	
 		totalPredBursts = bursts;
-		clk = clkIn;
+
 		curBurst = cBurst;
 	}
 
@@ -45,13 +42,10 @@ public class PCB {
     }
     	
 //Setters
-	public void setTimeFinishIO(int clk){
-		timeFinishIO = clk+10;
+	public void setTimeFinishIO(int clkIn){
+		timeFinishIO = clkIn+10;
 	}
     
-    public void setIsFinished(boolean bool){
-    	isFinished = bool;
-    }
     
     public void setTotalPredBursts(int[] numbers){
 		ArrayList<Integer> intList = new ArrayList<Integer>();
@@ -104,10 +98,7 @@ public class PCB {
 		}
 		return true;
 	}
-	
-	public boolean isFinished(){
-		return isFinished;
-	}
+
 	
 	public int getTimeFinishIO(){
 		return timeFinishIO;
@@ -174,11 +165,7 @@ public class PCB {
 	public void incrCpuShots(){
 	    cpuShots++;
 	}
-	public void incrSubQ(){
-	    if(subQ<=3){
-	        subQ++;
-	    }
-	}
+
 	public void incrIOReq(){
 	    IoReq++;
 	}
@@ -194,10 +181,7 @@ public class PCB {
                     break;
         }
 	}
-	public void curBurstFinished(){
-	    totalPredBursts.remove(0);
-	    numberPredBursts--;
-	}
+
 	public int getCPUShots(){
 		return cpuShots;
 	}

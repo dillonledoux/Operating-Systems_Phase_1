@@ -71,7 +71,11 @@ public class Scheduler{
 		job.setArrivalTime(system.getClk());
 		addToReadyQ(job);
 	}	
-
+	
+	public void incrementCPUShotsfromSch(){
+		
+	}
+	
 	public int getNextTask(){
 		if(getRQSize() != 0){
 
@@ -80,7 +84,7 @@ public class Scheduler{
 			int quantum = job.getQuantum();
 			job.incrCpuShots();
 			if(curBurst>quantum){
-				System.out.println("aqui1");
+
 				job.setCurBurst(curBurst-quantum);
 				job.incrTimeUsed(quantum);
 				updateQandT(job);
@@ -90,7 +94,6 @@ public class Scheduler{
 			}
 			else if(curBurst<quantum){
 				job.incrTimeUsed(curBurst);
-				System.out.println("aqui2");
 				if(job.hasMoreBursts()){
 					
 					moveFromRtoB(job);
@@ -103,9 +106,7 @@ public class Scheduler{
 			}
 			else{
 				job.incrTimeUsed(quantum);
-				System.out.println("aqui3");
 				if(job.hasMoreBursts()){
-					System.out.print("HELP");
 					job.advanceCurBurst();
 					updateQandT(job);
 					moveFromRtoB(job);
@@ -116,19 +117,19 @@ public class Scheduler{
 				return curBurst;
 			}
 		}
-		System.out.println("aqui4");
+
 		return 0;							// return of zero indicates no jobs in RQ
 	}
 	
 	
 	public void updateQandT(PCB job){
 		job.decrementTurns();
-        if(job.getTurns()<=1){
+        if(job.getTurns()<0){
             demote(job);
             job.resetTurns();  
         }
         else{
-        	job.decrementTurns();
+        	//job.decrementTurns();
         }
 	}
 
@@ -136,7 +137,7 @@ public class Scheduler{
     public void addToReadyQ(PCB job){
     	job.assignTurns(1);
         sbq1.add(job);        
-    }
+    } 
 
     public void moveFromRtoB(PCB job){
         blockedQ.add(job);
@@ -150,10 +151,10 @@ public class Scheduler{
     }
     public void checkBlockedQ(){
     	
-		System.out.println("here - 2");
+
 		boolean enoughTime = true;
     	while(enoughTime && !blockedQ.isEmpty()){
-    		System.out.println("here -3");
+
     		PCB job = blockedQ.peek();
     		if(system.getClk() < job.getTimeFinishIO()){
     			enoughTime = false;
@@ -177,7 +178,7 @@ public class Scheduler{
 	    int jID = info.remove(0);
 	    int jSize = info.remove(0);
 	    int cBurst = info.remove(0);
-        PCB pcb = new PCB(jID, jSize, cBurst, info, system.getClk()); // adding job id and size
+        PCB pcb = new PCB(jID, jSize, cBurst, info); // adding job id and size
 	    return pcb;
     }
      

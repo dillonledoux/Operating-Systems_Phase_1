@@ -14,13 +14,10 @@ public class Mem_manager{
             system.setFreeMemory(system.getFreeMemory() - size);
             return true;
         }
-		System.out.println("Memory full, not able to allocate.");
 		return false;
     }    
     public void release(int size){
         system.addFreeSpace(size);
-        System.out.println("" +size+ " memory units released");
-        System.out.println("Free space is now: " +system.getFreeMemory()+ " units");
     }
    
 // Housekeeping and Logging 

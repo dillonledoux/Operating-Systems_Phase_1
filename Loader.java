@@ -23,10 +23,7 @@ public class Loader{
 	SYSTEM system;
 	Mem_manager mem_manager;
 	Scheduler scheduler;
-	
-	
 		
-	
 // Constructor
 	public Loader(SYSTEM systemIn, Mem_manager mem_managerIn, Scheduler schedulerIn){
 	    system = systemIn;
@@ -70,19 +67,13 @@ public class Loader{
     	while(system.getFreeMemory()>=mem_manager.getMemCutoff() && scheduler.getTotalPCBs()<15
     			&& moreJobsInFile ){
     		newJob = getNextJob();
-    		System.out.println("\nFree Memory: "+system.getFreeMemory());
     		if(newJob.get(0) != 0){
     			canAllocate = mem_manager.allocate(newJob.get(1));
-    			System.out.println("moreJobsInFile = "+moreJobsInFile);
     			if(canAllocate){
-    				System.out.println("Job#" +newJob.get(0)+ " added to RQ");
-    				scheduler.setup(newJob);
-    				
+    				scheduler.setup(newJob);    				
     			}
     			else{
-    				System.out.println("Job# "+newJob.get(0)+ "added to JQ");
-    				jobQ.add(newJob);
-    				
+    				jobQ.add(newJob);   				
     			}
     		}
     		else{
@@ -118,12 +109,12 @@ public class Loader{
         return jobInfo;   
      }
 
-     public ArrayList<ArrayList<Integer>> getJobQ(){
+    public ArrayList<ArrayList<Integer>> getJobQ(){
     	return jobQ;
-     }
-     public void addToJobQ(ArrayList<Integer> job){
+    }
+    public void addToJobQ(ArrayList<Integer> job){
      	jobQ.add(job);
-     }
+    }
     public int getJobQSize(){
     	return jobQ.size();
     }

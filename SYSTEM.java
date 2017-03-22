@@ -1,7 +1,6 @@
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class SYSTEM{
@@ -15,7 +14,7 @@ public class SYSTEM{
      private static final int WRITE_EVERY = 200;
      
      private int jobsDelivered = 0;
-     private boolean jobsIncoming = true;
+
      
 // Object Variables
      Mem_manager mem_manager;
@@ -27,7 +26,6 @@ public class SYSTEM{
 // Constructor
     public SYSTEM(){
         initSysTime();
-        System.out.println(systemStartTime);
         mem_manager = new Mem_manager(this);
         scheduler = new Scheduler(this, mem_manager);
         loader = new Loader(this, mem_manager, scheduler);       
@@ -46,27 +44,15 @@ public class SYSTEM{
    
      
      public void simulate(){
-    	int count = 0;
     	 while(loader.hasMoreJobsInFile() || scheduler.getTotalPCBs() != 0){
     		
     		loader.loadTasks();
-/*    		System.out.print("sbq1");
-    		scheduler.getSubQ(1).printIDs();
-    		System.out.print("sbq4");
-    		scheduler.getSubQ(4).printIDs();
- */   		
-    		//if(scheduler.getRQSize() != 0){ 
-    			cpu.execute();
-    			System.out.println("Clock value:"+CLOCK);
-    			System.out.println("RQ size: "+scheduler.getRQSize());
-    			if(scheduler.getBlockedQ().size()>0){System.out.println("BQ size: "+scheduler.getBlockedQ().peek().getJobID());}
-    			System.out.println("JQ size: "+loader.getJobQSize());
-    		//}
-    		scheduler.checkBlockedQ();
 
-    	}	
-    	
-/**/ 	System.out.println(getJobsDelivered());
+    			cpu.execute();
+
+    		scheduler.checkBlockedQ();
+    	}
+    	System.out.println("Simulation complete");
      }
      
      public String getSystemStartTime(){
@@ -85,9 +71,7 @@ public class SYSTEM{
       public void addToClk(int value){
          CLOCK += value;
       }
-      public void setClk(int time){
-     	CLOCK = time;
-      }     
+    
       public void incrementClk(){
          CLOCK++;
       }
@@ -112,15 +96,11 @@ public class SYSTEM{
     }
     
     public void jobTerminated(PCB finishedJob){
-        finishedJob.setIsFinished(true);
     	finishedJob.setTimeDelivered(CLOCK);
     	logger.writeToJobLog(finishedJob);
         mem_manager.release(finishedJob.getJobSize());
         incrJobsDelivered();
         
-    }
-    public boolean hasJobsIncoming(){
-    	return jobsIncoming;
     }
 
     public void incrSysClock(int value){
