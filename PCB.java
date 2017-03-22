@@ -25,11 +25,12 @@ public class PCB {
 	private int subQTurns = 0;  //turns spent in given subqueue;
 	
 // Constructor
-	public PCB(int id, int size, ArrayList<Integer> bursts, int clkIn){
+	public PCB(int id, int size, int cBurst, ArrayList<Integer> bursts, int clkIn){
 		jobID = id;
 		jobSize = size;	
 		totalPredBursts = bursts;
 		clk = clkIn;
+		curBurst = cBurst;
 	}
 
 //Functions
@@ -37,8 +38,9 @@ public class PCB {
         String stats;
         // format:
         // job ID   EntryTime   TerminationTime    ExecTime    CpuShots
-        stats = "\n" +jobID+ "   " +timeArrival+ "   " +timeDelivered+ 
-                "   " +((IoReq*10)+timeUsed)+ "   " +cpuShots+ "";
+        stats = "\n" +jobID+ "\t" +timeArrival+ "\t\t" +timeDelivered+ 
+                "\t\t" +((IoReq*10)+timeUsed)+ "\t\t" +cpuShots+ 
+                "\n-----------------------------------------------------------";
         return stats;
     }
     	
@@ -63,11 +65,11 @@ public class PCB {
 	public void setCurBurst(int number){
 		curBurst = number;
 	}
-	public void setArrivalTime(){
-		timeArrival = clk;
+	public void setArrivalTime(int time){
+		timeArrival = time;
 	}
-	public void setTimeDelivered(){
-		timeDelivered = clk;
+	public void setTimeDelivered(int time){
+		timeDelivered = time;
 	}
 	public void setTimeUsed(int time){
 		timeUsed = time;
@@ -85,10 +87,9 @@ public class PCB {
                     break;
             case 3: subQTurns = 6;
                     break;
-            case 4: subQTurns = 2147483647;
+            default: subQTurns = 2147483647;
                     break;
-            default: subQTurns = -1;
-                    break;
+
         }
     }
 	public void incrIoRequests(){
@@ -122,11 +123,9 @@ public class PCB {
 	public int getJobSize(){
 		return jobSize;
 	}
-	public int getNextBurst(){
-		return totalPredBursts.remove(0);	    		
-	}
+
 	public int getCurBurst(){
-		return totalPredBursts.get(0);
+		return curBurst;
 	}
 	public int getTimeArrival(){
 		return timeArrival;
@@ -156,15 +155,8 @@ public class PCB {
     }
 
 // Mutators 
-    public void updateCurBurst(){
-    	if(getTotalPredBursts().isEmpty()){
-    		setCurBurst(-1);
-    		setIsFinished(true);   		
-    	}
-    	else{
-    		setCurBurst(getNextBurst());
-    	}
- 
+    public void advanceCurBurst(){
+    	curBurst = totalPredBursts.remove(0);
     }
     
     public void incrementTurns(){
@@ -198,9 +190,7 @@ public class PCB {
                     break;
             case 3: subQTurns = 6;
                     break;
-            case 4: subQTurns = 2147483647;
-                    break;
-            default: subQTurns = -1;
+            default: subQTurns = 2147483647;
                     break;
         }
 	}
@@ -208,7 +198,10 @@ public class PCB {
 	    totalPredBursts.remove(0);
 	    numberPredBursts--;
 	}
-
+	public int getCPUShots(){
+		return cpuShots;
+	}
+	
 
 
 }

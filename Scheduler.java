@@ -60,54 +60,63 @@ public class Scheduler{
     
     
     public PCB getNextPCB(){
-    	System.out.println("Highest non empty queue is: "+getHighestNonEmptySbqNumber());
-    	return getSubQ(getHighestNonEmptySbqNumber()).remove(0);
+    	PCB job = getSubQ(getHighestNonEmptySbqNumber()).remove(0);
+    	return job;
     }
     
     
     
 	public void setup(ArrayList<Integer> list){    
 	    PCB job = createPCB(list);
-		job.setArrivalTime();
+		job.setArrivalTime(system.getClk());
 		addToReadyQ(job);
 	}	
 
 	public int getNextTask(){
 		if(getRQSize() != 0){
-			System.out.println(getRQSize());
+
 			PCB job = getNextPCB();
 			int curBurst = job.getCurBurst();
-			if(curBurst>job.getQuantum()){
-				job.setCurBurst(curBurst-job.getQuantum());
-				job.incrCpuShots();
-				job.incrTimeUsed(job.getQuantum());
+			int quantum = job.getQuantum();
+			job.incrCpuShots();
+			if(curBurst>quantum){
+				System.out.println("aqui1");
+				job.setCurBurst(curBurst-quantum);
+				job.incrTimeUsed(quantum);
 				updateQandT(job);
 				endQuantumResch(job);
-				return job.getQuantum();
+				return quantum;
+				
 			}
-			else if(curBurst<job.getQuantum()){
+			else if(curBurst<quantum){
+				job.incrTimeUsed(curBurst);
+				System.out.println("aqui2");
 				if(job.hasMoreBursts()){
+					
 					moveFromRtoB(job);
 					job.resetTurns();
-					job.updateCurBurst();
+					job.advanceCurBurst();
 					return curBurst;
 				}
-				job.setIsFinished(true);
-				job.setTimeDelivered();
 				system.jobTerminated(job);
 				return curBurst;
 			}
 			else{
+				job.incrTimeUsed(quantum);
+				System.out.println("aqui3");
 				if(job.hasMoreBursts()){
+					System.out.print("HELP");
+					job.advanceCurBurst();
+					updateQandT(job);
 					moveFromRtoB(job);
-					return job.getQuantum();
+					return quantum;
 				}
-				job.setIsFinished(true);
-				job.setTimeDelivered();
+				
 				system.jobTerminated(job);
 				return curBurst;
 			}
 		}
+		System.out.println("aqui4");
 		return 0;							// return of zero indicates no jobs in RQ
 	}
 	
@@ -131,37 +140,35 @@ public class Scheduler{
 
     public void moveFromRtoB(PCB job){
         blockedQ.add(job);
-        if(job.getSubQNumber()!=1){
+        if(job.getSubQNumber()==4){
         	job.setSubQ(1);
         	job.resetTurns();
         }
         job.incrIOReq();
-        job.setTimeFinishIO(system.getClk()+10);
+        job.setTimeFinishIO(system.getClk());
 
     }
     public void checkBlockedQ(){
-    	while(true){
+    	
+		System.out.println("here - 2");
+		boolean enoughTime = true;
+    	while(enoughTime && !blockedQ.isEmpty()){
+    		System.out.println("here -3");
     		PCB job = blockedQ.peek();
     		if(system.getClk() < job.getTimeFinishIO()){
-    			break;
+    			enoughTime = false;
     		}
-    		addToSubQ(job.getSubQNumber(), job);
+    		else{
+    			job = blockedQ.pop();
+    			addToSubQ(job.getSubQNumber(), job);
+    		}
     	}
+    		
     }
     public void demote(PCB job){
-        if(job.getSubQNumber()!=4){job.setSubQ(job.getSubQNumber()+1);}
-        switch (job.getSubQNumber()){
-            case 1: sbq1.remove(job);
-            		sbq2.add(job);
-                    break;
-            case 2: sbq2.remove(job);
-            		sbq3.add(job);
-                    break;
-            case 3: sbq3.remove(job);
-            		sbq4.add(job);
-                    break;
-            default: break;                 
-        }
+        if(job.getSubQNumber()<4){
+	        job.setSubQ(job.getSubQNumber()+1);
+        }    
     }
   
 // Situational Functions
@@ -169,7 +176,8 @@ public class Scheduler{
         ArrayList<Integer> info = list;
 	    int jID = info.remove(0);
 	    int jSize = info.remove(0);
-        PCB pcb = new PCB(jID, jSize, info, system.getClk()); // adding job id and size
+	    int cBurst = info.remove(0);
+        PCB pcb = new PCB(jID, jSize, cBurst, info, system.getClk()); // adding job id and size
 	    return pcb;
     }
      

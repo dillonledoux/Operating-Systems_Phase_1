@@ -13,7 +13,7 @@ public class Loader{
 	private String jobFilePointerLocalWin = "C:\\Users\\Dillon LeDoux\\Desktop\\17s-ph1-data.txt";
 	private String jobFilePointerLocalMac = "/Users/dillonledoux/Desktop/testData.txt";
 	
-	private final File jobFile = new File(jobFilePointerLocalWin);
+	private final File jobFile = new File(jobFilePointerLocalMac);
 	private Scanner scanner;
 	
 	private boolean moreJobsInFile = true;
@@ -86,7 +86,6 @@ public class Loader{
     			}
     		}
     		else{
-    			system.setJobsIncoming(false);
     			break;
     		}
     	}
@@ -95,13 +94,23 @@ public class Loader{
 // Initialization Methods
     
     public ArrayList<Integer> getNextJob(){
-    	String line = scanner.nextLine();
     	if(scanner.hasNextLine() == false){
     		moreJobsInFile = false;
+    		ArrayList<Integer> list = new ArrayList<>();
+    		list.add(0);
+    		return list;
     	}
+    	String line = scanner.nextLine();
+    	
     	
         ArrayList<String> stringList = new ArrayList<>(Arrays.asList(line.split("\\W+")));
-        stringList.remove(0);
+        try{
+        	Integer.parseInt(stringList.get(0));
+        }
+        catch(Exception e){
+        	stringList.remove(0);
+        }
+        
         ArrayList<Integer> jobInfo = new ArrayList<>();
         for(String s: stringList){
         	jobInfo.add(Integer.valueOf(s));

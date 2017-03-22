@@ -30,7 +30,7 @@ public class Mem_manager{
     }
     public String memStats(){
             //  @ X time units          Free Space                 Used Space
-        return "\n@ " +system.getClk()+ "\n      " +system.getFreeMemory()+ "   " 
+        return "\n@ " +system.getClk()+ " Time Units:\nFree Space = " +system.getFreeMemory()+ "  |  Used Space = " 
                 +(SYSTEM.totalMemory-system.getFreeMemory())+"";
     }
 

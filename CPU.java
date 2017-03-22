@@ -13,24 +13,18 @@ public class CPU{
 	
 	public void execute(){
 		
-		System.out.print("yay");
-	
-
-		
 		int executeTime = scheduler.getNextTask();
+		system.incrSysClock(executeTime);
 		if(executeTime == 0){
-			noJobWait();
-		}
-
-		
-	
-	
+			noJobWait();			
+		}	
 	}
 	
 	public boolean noJobWait(){
 		if(scheduler.getRQSize()==0 && scheduler.getBlockedQ().size()>0){
-			int newclk = scheduler.getBlockedQ().peek().getTimeFinishIO();
-			system.setClk(newclk);
+			int newclk = scheduler.getBlockedQ().peek().getTimeFinishIO()-system.getClk();
+			system.incrSysClock(newclk);
+			System.out.println("BLALALLALAHAJLA");
 			return true;
 		}
 		return false;

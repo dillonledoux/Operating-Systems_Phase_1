@@ -4,8 +4,8 @@ import java.io.IOException;
 
 public class LogWriter {
 	
-	private static final String SYS_LOG_PATH = "C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt";  //   C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt    /Users/dillonledoux/Desktop/SYS_LOG.txt
-	private static final String JOB_LOG_PATH = "C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt";	// C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt
+	private static final String SYS_LOG_PATH = "/Users/dillonledoux/Desktop/SYS_LOG.txt";  //   C:\\Users\\Dillon LeDoux\\Desktop\\SYS_LOG.txt    /Users/dillonledoux/Desktop/SYS_LOG.txt
+	private static final String JOB_LOG_PATH = "/Users/dillonledoux/Desktop/JOB_LOG.txt";	// C:\\Users\\Dillon LeDoux\\Desktop\\JOB_LOG.txt
 	
 	SYSTEM sys;
 	Mem_manager mem;
@@ -25,10 +25,10 @@ public class LogWriter {
 	
     public void writeToSysLog(){
         String toWriteMem = mem.memStats();
-        String toWriteJobs = "\nNumber of jobs in Job_Q: " +ld.getJobQ().size()+ 
-                             "\nNumber of jobs in Blocked_Q: " +sch.getBlockedQ().size()+
-                             "\nNumber of jobs in Ready_Q: " +sch.getRQSize()+
-                             "\nTotal jobs delivered: " +sys.getJobsDelivered()+ "";
+        String toWriteJobs = "\nNumber of jobs in Job_Q:\t" +ld.getJobQ().size()+ 
+                             "\nNumber of jobs in Blocked_Q:\t" +sch.getBlockedQ().size()+
+                             "\nNumber of jobs in Ready_Q:\t" +sch.getRQSize()+
+                             "\nTotal jobs delivered:\t\t" +sys.getJobsDelivered()+ "\n";
         
         File file = new File(SYS_LOG_PATH);
     	try{
@@ -46,7 +46,7 @@ public class LogWriter {
      } 
     
     public static void setupSysLog(){
-    	String header = "\nSYS_LOG file starting at CSX time of  +sys.getSystemStartTime()+ \n Time Units     Free Space      Used Space\n";        
+    	String header = "\nSYS_LOG file starting at CSX time of "+SYSTEM.systemStartTime;        
 		File file = new File(SYS_LOG_PATH);
 		try{
 			file.createNewFile();
@@ -60,7 +60,7 @@ public class LogWriter {
 		
     }
     public static void setupJobLog(){
-        String header = "\nJOB_LOG file starting at CSX time of +system.getSystemStartTime()+ \nJob ID   Entry Time  Term. Time    Ex. Time    CPU Shots\n";        
+        String header = "\nJOB_LOG file starting at CSX time of "+SYSTEM.systemStartTime+ " \n\nJob ID\tEntry Time\tTerm. Time\tEx. Time\tCPU Shots\n";        
         File file = new File(JOB_LOG_PATH);
         try{    
 			file.createNewFile();
