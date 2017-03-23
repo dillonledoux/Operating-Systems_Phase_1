@@ -1,60 +1,71 @@
-
+/*
+ * --Description--
+ * This class serves as a data structure for holding
+ * all the necessary information about a job in the 
+ * system and allows other classes to access this info
+ * when requested.   
+ */
 import java.util.ArrayList;
 
 public class PCB {
 	
 // Global variables	
 	private int jobID;
-	private int jobSize;		// memory required for job
+	private int jobSize; // memory required for job
 	
 	private ArrayList<Integer> totalPredBursts;		// the burst length for each predicted job
 	private int curBurst;		// current burst length
 	
 	private int timeArrival;	// time job entered the system
-	private int timeDelivered;       // time job terminated
+	private int timeDelivered;  // time job terminated
 	private int timeUsed;		// cumulative CPU time used by the job
-	private int timeFinishIO;
+	private int timeFinishIO;	// time the job will finish an IO request
 	private int IoReq;          // number of I/O requests
-	private int cpuShots;       // number of shots the job gets at the cpu
-	//private boolean isFinished = false;
+	private int cpuShots;       // number of shots the job gets at the cpu	
+	private int subQ = 1;       //current subqueue, initially in subQ1
+	private int subQTurns = 3;  //turns spent in given subqueue;
 	
-	private int subQ = 0;       //current subqueue
-	private int subQTurns = 0;  //turns spent in given subqueue;
-	
-// Constructor
+//  ---Constructor---
 	public PCB(int id, int size, int cBurst, ArrayList<Integer> bursts){
 		jobID = id;
 		jobSize = size;	
 		totalPredBursts = bursts;
-
 		curBurst = cBurst;
 	}
 
-//Functions
-    public String jobStats(){
+//		---Object Functions---
+    /**
+     * Returns a String containing information collected about the job
+     * to send to the logger at the appropriate call
+     */
+	public String jobStats(){
         String stats;
         stats = String.format("%-3d    |  %-5d  |    %-5d    |    %-4d   |  %-2d   |", 
-        		jobID, timeArrival, timeDelivered, ((IoReq*10)+timeUsed), cpuShots);
-
-        
+        		jobID, timeArrival, timeDelivered, ((IoReq*10)+timeUsed), cpuShots);       
         return stats;
     }
+	/**
+	 * Assigns the appropriate number of turns based
+	 * on the number supplied which represents the
+	 * subQ number the job resides in.
+	 */
+    public void assignTurns(int n){
+        switch (n){
+            case 1: subQTurns = 3;
+                    break;
+            case 2: subQTurns = 5;
+                    break;
+            case 3: subQTurns = 6;
+                    break;
+            default: subQTurns = 2147483647;
+                    break;
+        }
+    }
     	
-//Setters
+//		---Setters and Getters---
 	public void setTimeFinishIO(int clkIn){
 		timeFinishIO = clkIn+10;
 	}
-    
-    
-    public void setTotalPredBursts(int[] numbers){
-		ArrayList<Integer> intList = new ArrayList<Integer>();
-		for (int i = 0; i < numbers.length; i++)
-		{
-		    intList.add(numbers[i]);
-		}
-		totalPredBursts = intList;		
-	}
-
 	public void setCurBurst(int number){
 		curBurst = number;
 	}
@@ -67,53 +78,28 @@ public class PCB {
 	public void setTimeUsed(int time){
 		timeUsed = time;
 	}
-
-
 	public void setSubQ(int number){
 	    subQ = number;
 	}
-    public void assignTurns(int n){
-        switch (n){
-            case 1: subQTurns = 3;
-                    break;
-            case 2: subQTurns = 5;
-                    break;
-            case 3: subQTurns = 6;
-                    break;
-            default: subQTurns = 2147483647;
-                    break;
 
-        }
-    }
-	public void incrIoRequests(){
-	    IoReq++;
-	}
-
-		
-// Getters
 	public boolean hasMoreBursts(){
 		if(totalPredBursts.isEmpty()){
 			return false;
 		}
 		return true;
 	}
-
-	
 	public int getTimeFinishIO(){
 		return timeFinishIO;
 	}
-	
 	public ArrayList<Integer> getTotalPredBursts(){
 		return totalPredBursts;
 	}
-	
 	public int getJobID(){
 		return jobID;
 	}
 	public int getJobSize(){
 		return jobSize;
 	}
-
 	public int getCurBurst(){
 		return curBurst;
 	}
@@ -123,6 +109,10 @@ public class PCB {
 	public int getTimeUsed(){
 		return timeUsed;
 	}
+	/**
+	 * Returns the appropriate time quantum derived from
+	 * the subQ which the job currently resides
+	 */
 	public int getQuantum(){
 	    if(subQ==1){
 	        return 20;
@@ -144,11 +134,13 @@ public class PCB {
         return subQ;
     }
 
-// Mutators 
+//		---Mutators--- 
+	public void incrIoRequests(){
+	    IoReq++;
+	}
     public void advanceCurBurst(){
     	curBurst = totalPredBursts.remove(0);
-    }
-    
+    }   
     public void incrementTurns(){
 	    subQTurns++;
 	}
@@ -164,7 +156,6 @@ public class PCB {
 	public void incrCpuShots(){
 	    cpuShots++;
 	}
-
 	public void incrIOReq(){
 	    IoReq++;
 	}
@@ -180,12 +171,8 @@ public class PCB {
                     break;
         }
 	}
-
 	public int getCPUShots(){
 		return cpuShots;
 	}
-	
-
-
 }
 

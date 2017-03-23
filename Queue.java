@@ -1,11 +1,17 @@
+/*
+ * ---Description---
+ * Queue serves as a custom data structure used to hold
+ * PCBs in a queque fashion.  It extends ArrayList and
+ * overrides many methods from the super.
+ */
 import java.util.ArrayList;
 
 public class Queue extends ArrayList<PCB>{
 
-// Class Variables
+//		---Class Variables---
     public ArrayList<PCB> al_q;
 
-// Constructor
+//		---Constructors---
     public Queue(){
         al_q = new ArrayList<PCB>();
     }
@@ -13,7 +19,7 @@ public class Queue extends ArrayList<PCB>{
     	al_q = new ArrayList<PCB>(capacity);
     }
 
-// Overridden Methods
+//		---Overridden Methods---
     public boolean add(PCB job){
        return al_q.add(job);
     }
@@ -29,21 +35,10 @@ public class Queue extends ArrayList<PCB>{
     public PCB remove(int index){
     	return al_q.remove(index);
     }
-    public void printIDs(){
-    	
-    	System.out.print("\nThe Job ID's are: ");
-    	for(PCB j : al_q){
-    		System.out.print("" +j.getJobID()+ " ");
-    	}
-    	System.out.println();
-    }
     public int size(){
     	return al_q.size();
     }
-
     public boolean isEmpty(){
     	return al_q.isEmpty();
     }
-
-
 }
