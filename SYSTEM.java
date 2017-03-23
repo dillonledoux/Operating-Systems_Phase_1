@@ -66,8 +66,9 @@ public class SYSTEM{
 
 //		---MAIN---     
     public static void main(String args[]){
-		SYSTEM sys = new SYSTEM();
-		fileLocation = args[0];
+    	fileLocation = args[0];
+    	SYSTEM sys = new SYSTEM();
+		
     }
        
 //		---SYSTEM Object Methods---
